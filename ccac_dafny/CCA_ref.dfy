@@ -2,7 +2,7 @@ include "buffer.dfy"
 
 module CCA {
   import opened Buffer
-method AIMD(recent_loss: int, recent_service: int, cwnd: real ) returns (y : real) 
+method AIMD(recent_loss: int, cwnd: real ) returns (y : real) 
   ensures 0 <= y.Floor <= cwnd.Floor + 1
   requires cwnd.Floor >= 0
 {
@@ -14,7 +14,7 @@ method AIMD(recent_loss: int, recent_service: int, cwnd: real ) returns (y : rea
   }
 }
 
-method ArrivalTime(recent_loss: int, recent_service: int, cwnd: real, in_flight: int) returns (y : int) 
+method ArrivalTime(recent_loss: int, cwnd: real, in_flight: int) returns (y : int) 
 ensures y >= 0
 ensures y <= cwnd.Floor
 requires cwnd.Floor >= 0
@@ -61,13 +61,13 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
     var total_seen_serviced_new := total_seen_serviced + recent_service;
     var total_lost_new := total_lost + recent_loss;
 
-    var cwnd' := AIMD(recent_loss, recent_service, cwnd);
+    var cwnd' := AIMD(recent_loss, cwnd);
 
     assert(|ibs[2]| >= cwnd'.Floor);
 
     in_flight := total_sent - total_seen_serviced_new - total_lost_new;
 
-    var arrive_amount := ArrivalTime(recent_loss, recent_service, cwnd', in_flight);
+    var arrive_amount := ArrivalTime(recent_loss, cwnd', in_flight);
 
     assert(in_flight >= 0 && in_flight < cwnd'.Floor ==> in_flight + arrive_amount == cwnd'.Floor);
 
