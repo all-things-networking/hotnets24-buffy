@@ -3,7 +3,7 @@ include "buffer.dfy"
 
 module CCA {
   import opened Buffer
-method AIMD(recent_loss: int, recent_service: int, timeout: bool, cwnd: real ) returns (y : real) 
+method AIMD(recent_loss: int, cwnd: real) returns (y : real) 
   ensures 0 <= y.Floor <= cwnd.Floor + 1
   requires cwnd.Floor >= 0
 {
@@ -15,7 +15,7 @@ method AIMD(recent_loss: int, recent_service: int, timeout: bool, cwnd: real ) r
   }
 }
 
-method ArrivalTime(recent_loss: int, recent_service: int, timeout: bool, cwnd: real, in_flight: int) returns (y : int) 
+method ArrivalTime(cwnd: real, in_flight: int) returns (y : int) 
 ensures y >= 0
 ensures y <= cwnd.Floor
 requires cwnd.Floor >= 0
@@ -49,33 +49,28 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
     ensures total_sent_new - total_sent == backlog(obs[0])
     ensures total_lost_new >= 0
     ensures total_seen_serviced_new >= 0
-  
-
 {
     //ibs[0] is loss, ibs[1] is serviced,ibs[2] is input obs[0] is arrived, 
-    var recent_loss := 0;
-    var recent_service := 0;
-    var timeout := false;
     var in_flight := total_sent - total_lost - total_seen_serviced;
-    recent_loss := backlog(ibs[0]);
+    var recent_loss := backlog(ibs[0]);
     ibs[0] := [];
-    recent_service := backlog(ibs[1]);
-    if (in_flight == recent_loss) {
-        timeout := true;
-    }
+    total_lost_new := total_lost + recent_loss;
+
+    var recent_service := backlog(ibs[1]);
     ibs[1] := [];
     total_seen_serviced_new := total_seen_serviced + recent_service;
-    total_lost_new := total_lost + recent_loss;
-    cwnd' := AIMD(recent_loss, recent_service, timeout, cwnd);
+
+    cwnd' := AIMD(recent_loss, cwnd);
+
     assert(|ibs[2]| >= cwnd'.Floor);
+
     in_flight := total_sent - total_seen_serviced_new - total_lost_new;
-    var arrive_amount := ArrivalTime(recent_loss, recent_service, timeout, cwnd', in_flight);
-    //assert(in_flight >= 0);
+
+    var arrive_amount := ArrivalTime(cwnd', in_flight);
+    // assert(in_flight >= 0);
     assert(in_flight >= 0 && in_flight < cwnd'.Floor ==> in_flight + arrive_amount == cwnd'.Floor);
     in_flight := in_flight + arrive_amount;
     ibs[2], obs[0] := moven(ibs[2], obs[0], arrive_amount);
-    print(arrive_amount);
     total_sent_new := total_sent + arrive_amount;
-    return cwnd', total_sent_new, total_lost_new, total_seen_serviced_new;
   }
 }
