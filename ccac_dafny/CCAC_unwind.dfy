@@ -235,8 +235,8 @@ method {:axiom} Main(){
     obc[0] := [];
     time := time + 1;
     // assert(|wastetrack| == 7);
-    assume(wastetrack == [0, 0, 0, 0, 0, 0, 0]);
-    assume(servicetrack == [5, 10, 10, 10, 20, 20, 20]);
+    assume {:axiom} (wastetrack == [0, 0, 0, 0, 0, 0, 0]);
+    assume {:axiom} (servicetrack == [5, 10, 10, 10, 20, 20, 20]);
     assert(lost > 0);
     print("\n");
 

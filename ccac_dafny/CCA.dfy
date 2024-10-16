@@ -32,7 +32,7 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
 }
 
   method run_t (ibs: array<Buf>, obs: array<Buf>, cwnd: real, total_sent: int, 
-  total_lost: int, total_seen_serviced: int) returns (y : real, a : int, b : int, c : int) 
+  total_lost: int, total_seen_serviced: int) returns (cwnd' : real, total_sent_new : int, total_lost_new : int, total_seen_serviced_new : int) 
     requires total_lost >= 0 && total_seen_serviced >= 0
     requires ibs.Length >= 3
     requires obs.Length >= 1
@@ -42,20 +42,17 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
     modifies ibs
     modifies obs
     requires cwnd.Floor >= 0
-    ensures y.Floor >= 0
-    ensures y.Floor <= cwnd.Floor + 1
+    ensures cwnd'.Floor >= 0
+    ensures cwnd'.Floor <= cwnd.Floor + 1
     requires total_sent >= 0
     //ensures  y.Floor <= a - b - c
-    ensures a - total_sent == backlog(obs[0])
-    ensures b >= 0
-    ensures c >= 0
+    ensures total_sent_new - total_sent == backlog(obs[0])
+    ensures total_lost_new >= 0
+    ensures total_seen_serviced_new >= 0
   
 
 {
     //ibs[0] is loss, ibs[1] is serviced,ibs[2] is input obs[0] is arrived, 
-    var total_sent_new := total_sent;
-    var total_lost_new := total_lost;
-    var total_seen_serviced_new := total_seen_serviced;
     var recent_loss := 0;
     var recent_service := 0;
     var timeout := false;
@@ -67,18 +64,18 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
         timeout := true;
     }
     ibs[1] := [];
-    total_seen_serviced_new := total_seen_serviced_new + recent_service;
-    total_lost_new := total_lost_new + recent_loss;
-    var cwnd' := AIMD(recent_loss, recent_service, timeout, cwnd);
+    total_seen_serviced_new := total_seen_serviced + recent_service;
+    total_lost_new := total_lost + recent_loss;
+    cwnd' := AIMD(recent_loss, recent_service, timeout, cwnd);
     assert(|ibs[2]| >= cwnd'.Floor);
-    in_flight := total_sent_new - total_seen_serviced_new - total_lost_new;
+    in_flight := total_sent - total_seen_serviced_new - total_lost_new;
     var arrive_amount := ArrivalTime(recent_loss, recent_service, timeout, cwnd', in_flight);
     //assert(in_flight >= 0);
     assert(in_flight >= 0 && in_flight < cwnd'.Floor ==> in_flight + arrive_amount == cwnd'.Floor);
     in_flight := in_flight + arrive_amount;
     ibs[2], obs[0] := moven(ibs[2], obs[0], arrive_amount);
     print(arrive_amount);
-    total_sent_new := total_sent_new + arrive_amount;
+    total_sent_new := total_sent + arrive_amount;
     return cwnd', total_sent_new, total_lost_new, total_seen_serviced_new;
   }
 }
