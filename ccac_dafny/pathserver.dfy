@@ -103,57 +103,54 @@ predicate greaterthan0(s: seq<int>)
     ensures tokens + c <= backlog(ibs[0]) && time > 1 ==> y[time - 1] - y[time - 2] == 0
     ensures tokens + c <= backlog(ibs[0]) && time == 1 ==> y[time - 1] == 0
   {
-    //ibs[0] is loss, ibs[1] is serviced,ibs[2] is input obs[0] is arrived, 
-    var recent_loss := 0;
-    var recent_service := 0;
-    var addamount := gettokenamount(tokens, backlog(ibs[0]), c);
-    var wasteamount := c - addamount;
+    // obs[0] serviced, obs[1] loss, obs[2] ack
+    var new_tokens := gettokenamount(tokens, backlog(ibs[0]), c);
+    var waste_tokens := c - new_tokens;
     var lowerbound := 0;
     if (time >= delay) {
         lowerbound := max(0, c * (time - delay) - wastetrack[time - delay]);
     }
-    var wasteadd := wasteamount;
+    var wasteadd := waste_tokens;
     if(|wastetrack| > 0) {
-      wasteadd := wastetrack[|wastetrack| - 1] + wasteamount;
+      wasteadd := wastetrack[|wastetrack| - 1] + waste_tokens;
     }
     var upperbound := (c * time) - wasteadd;
     var servicetotal :| lowerbound <= servicetotal <= upperbound;
     if (time > 1 && servicetotal <= servicetrack[|servicetrack| - 1]) {
       servicetotal := servicetrack[|servicetrack| - 1];
     }
-    var sub := 0;
+    var prev_service := 0;
     if(time > 1) {
-      sub := servicetrack[|servicetrack| - 1];
+      prev_service := servicetrack[|servicetrack| - 1];
     }
-    var serviceincr := servicetotal - sub;
-    print(serviceincr);
-    var start := ibs[0];
-    ghost var initial := |start|;
+    var serviceincr := servicetotal - prev_service;
+    var arrival_buf := ibs[0];
+    ghost var prev_backlog := |arrival_buf|;
     if(serviceincr <= servicetotal) {
     for j := 0 to serviceincr 
         invariant 0 <= j <= serviceincr
-        invariant backlog(start) >= 0
-        invariant backlog(start) >= initial - j - 1
-        invariant |start| == 0 ==> backlog(start) <= initial 
-        invariant |start| > 0 ==> |start| <= initial - j
+        invariant backlog(arrival_buf) >= 0
+        invariant backlog(arrival_buf) >= prev_backlog - j - 1
+        invariant |arrival_buf| == 0 ==> backlog(arrival_buf) <= prev_backlog 
+        invariant |arrival_buf| > 0 ==> |arrival_buf| <= prev_backlog - j
     {
-        ghost var initial := |ibs[0]|;
-        var (ib, ob) := move(start, obs[0]);
-        start := ib;
+        ghost var prev_backlog := |arrival_buf|;
+        var (ib, ob) := move(arrival_buf, obs[0]);
+        arrival_buf := ib;
         obs[0] := ob;
         obs[2] := obs[2] + [time];
     }
     }
-    ibs[0] := start;
+    ibs[0] := arrival_buf;
     var lost := 0;
-    var newtokens := tokens + addamount - serviceincr;
+    var newtokens := tokens + new_tokens - serviceincr;
     if(backlog(ibs[0]) - newtokens > loss_threshold) {
       var lost_bytes := (backlog(ibs[0]) - loss_threshold);
       ibs[0], obs[1] := moven(ibs[0], obs[1], lost_bytes);
       lost := lost_bytes;
     }
     return newtokens, 
-    if time == 1 then [wasteamount] else wastetrack + [wastetrack[|wastetrack| - 1] + wasteamount], 
+    if time == 1 then [waste_tokens] else wastetrack + [wastetrack[|wastetrack| - 1] + waste_tokens], 
     if time == 1 then [servicetotal] else servicetrack + [servicetotal];
   }
 
