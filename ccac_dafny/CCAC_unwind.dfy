@@ -6,7 +6,6 @@ import CC = CCA
 const T := 10
 import opened Buffer
 
-
 //method flush(ob: Buf, ib: Buf)
 // method flush(ob: array<Buf>, oi: int, ib: array<Buf>, ii: int)
 
@@ -31,21 +30,22 @@ method {:axiom} Main(){
   var lost := 0;
   var seen_serviced := 0;
   var a, b, c, d;
-    for i := 0 to (cwnd.Floor + 2)
-      invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
-    {
-      iba[2] := iba[2] + [1];
-    }
+  for i := 0 to (cwnd.Floor + 2)
+    invariant 0 <= i <= cwnd.Floor + 2
+    invariant |iba[2]| >= i
+  {
+    iba[2] := iba[2] + [1];
+  }
   iba[0] := [];
   iba[1] := [];
   oba[0] := [];
+  {
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     assert(|oba[0]| == b - sent);
-      assert(seen_serviced == 0);
+    assert(seen_serviced == 0);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -66,11 +66,13 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
+  }
+  {
     //another iteration
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -90,11 +92,13 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
+  }
+  {
     //another iteration
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -114,35 +118,13 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
-        //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
-    for i := 0 to (cwnd.Floor + 2)
-      invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
-      invariant |oba[0]| == b - sent
-    {
-      iba[2] := iba[2] + [1];
-    }
-    cwnd := a;
-    sent := b;
-    lost := c;
-    seen_serviced := d;
-    ibb[0] := ibb[0] + oba[0];
-    oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
-    iba[0] := iba[0] +  obb[1];
-    obb[1] := [];
-    ibc[0] := ibc[0] +  obb[2];
-    obb[2] := [];
-    DelayServer.run_t(ibc, obc, time);
-    iba[1] := iba[1] + obc[0];
-    obc[0] := [];
-    time := time + 1;
+  }
+  {
     //another iteration
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -162,11 +144,13 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
+  }
+  {
     //another iteration
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -186,11 +170,13 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
+  }
+  {
     //another iteration
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -210,11 +196,13 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
+  }
+  {
     //another iteration
     a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
-      invariant |iba[2]| >= i  
+      invariant |iba[2]| >= i
       invariant |oba[0]| == b - sent
     {
       iba[2] := iba[2] + [1];
@@ -234,11 +222,39 @@ method {:axiom} Main(){
     iba[1] := iba[1] + obc[0];
     obc[0] := [];
     time := time + 1;
-    // assert(|wastetrack| == 7);
-    assume {:axiom} (wastetrack == [0, 0, 0, 0, 0, 0, 0]);
-    assume {:axiom} (servicetrack == [5, 10, 10, 10, 20, 20, 20]);
-    assert(lost > 0);
-    print("\n");
+  }
+  {
+    //another iteration
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    for i := 0 to (cwnd.Floor + 2)
+      invariant 0 <= i <= cwnd.Floor + 2
+      invariant |iba[2]| >= i
+      invariant |oba[0]| == b - sent
+    {
+      iba[2] := iba[2] + [1];
+    }
+    cwnd := a;
+    sent := b;
+    lost := c;
+    seen_serviced := d;
+    ibb[0] := ibb[0] + oba[0];
+    oba[0] := [];
+    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    iba[0] := iba[0] +  obb[1];
+    obb[1] := [];
+    ibc[0] := ibc[0] +  obb[2];
+    obb[2] := [];
+    DelayServer.run_t(ibc, obc, time);
+    iba[1] := iba[1] + obc[0];
+    obc[0] := [];
+    time := time + 1;
+  }
+
+  // assert(|wastetrack| == 7);
+  assume {:axiom} (wastetrack == [0, 0, 0, 0, 0, 0, 0]);
+  assume {:axiom} (servicetrack == [5, 10, 10, 10, 20, 20, 20]);
+  assert(lost > 0);
+  print("\n");
 
 }
 
