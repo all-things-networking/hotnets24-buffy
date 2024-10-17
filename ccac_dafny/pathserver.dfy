@@ -68,7 +68,7 @@ predicate greaterthan0(s: seq<int>)
 }
 
 
-  method run_ts (ibs: array<Buf>, obs: array<Buf>, tokens: int, wastetrack: seq<int>, servicetrack: seq<int>, time: int)  returns (x : int, y : seq<int>, z  : seq<int>)
+  method run_ts (ibs: array<Buf>, obs: array<Buf>, tokens: int, wastetrack: seq<int>, servicetrack: seq<int>, time: int)  returns (x : int, y : seq<int>, z  : seq<int>, recent_loss: int)
     requires ibs.Length >= 1
     requires obs.Length >= 3
     modifies ibs
@@ -102,6 +102,7 @@ predicate greaterthan0(s: seq<int>)
     ensures time > 1 ==> sameforn(servicetrack, z, time - 1)
     ensures tokens + c <= backlog(ibs[0]) && time > 1 ==> y[time - 1] - y[time - 2] == 0
     ensures tokens + c <= backlog(ibs[0]) && time == 1 ==> y[time - 1] == 0
+    ensures recent_loss >= 0
   {
     // obs[0] serviced, obs[1] loss, obs[2] ack
     var new_tokens := gettokenamount(tokens, backlog(ibs[0]), c);
@@ -151,7 +152,7 @@ predicate greaterthan0(s: seq<int>)
     }
     return newtokens, 
     if time == 1 then [waste_tokens] else wastetrack + [wastetrack[|wastetrack| - 1] + waste_tokens], 
-    if time == 1 then [servicetotal] else servicetrack + [servicetotal];
+    if time == 1 then [servicetotal] else servicetrack + [servicetotal], lost;
   }
 
 

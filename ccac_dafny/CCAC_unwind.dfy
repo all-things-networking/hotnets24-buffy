@@ -30,6 +30,8 @@ method {:axiom} Main(){
   var lost := 0;
   var seen_serviced := 0;
   var a, b, c, d;
+  var recent_loss := 0;
+
   for i := 0 to (cwnd.Floor + 2)
     invariant 0 <= i <= cwnd.Floor + 2
     invariant |iba[2]| >= i
@@ -40,7 +42,7 @@ method {:axiom} Main(){
   iba[1] := [];
   oba[0] := [];
   {
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     assert(|oba[0]| == b - sent);
     assert(seen_serviced == 0);
     for i := 0 to (cwnd.Floor + 2)
@@ -57,7 +59,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -69,7 +71,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -83,7 +85,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -95,7 +97,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -109,7 +111,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -121,7 +123,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -135,7 +137,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -147,7 +149,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -161,7 +163,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -173,7 +175,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -187,7 +189,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -199,7 +201,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -213,7 +215,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];
@@ -225,7 +227,7 @@ method {:axiom} Main(){
   }
   {
     //another iteration
-    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced);
+    a, b, c, d := CC.run_t(iba, oba, cwnd, sent, lost, seen_serviced, recent_loss);
     for i := 0 to (cwnd.Floor + 2)
       invariant 0 <= i <= cwnd.Floor + 2
       invariant |iba[2]| >= i
@@ -239,7 +241,7 @@ method {:axiom} Main(){
     seen_serviced := d;
     ibb[0] := ibb[0] + oba[0];
     oba[0] := [];
-    tokens, wastetrack, servicetrack := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
+    tokens, wastetrack, servicetrack, recent_loss := PathServer.run_ts(ibb, obb, tokens, wastetrack, servicetrack, time);
     iba[0] := iba[0] +  obb[1];
     obb[1] := [];
     ibc[0] := ibc[0] +  obb[2];

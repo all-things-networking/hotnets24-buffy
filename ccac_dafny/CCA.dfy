@@ -32,8 +32,9 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
 }
 
   method run_t (ibs: array<Buf>, obs: array<Buf>, cwnd: real, total_sent: int, 
-  total_lost: int, total_seen_serviced: int) returns (cwnd' : real, total_sent_new : int, total_lost_new : int, total_seen_serviced_new : int) 
+  total_lost: int, total_seen_serviced: int, recent_loss: int) returns (cwnd' : real, total_sent_new : int, total_lost_new : int, total_seen_serviced_new : int) 
     requires total_lost >= 0 && total_seen_serviced >= 0
+    requires recent_loss >= 0
     requires ibs.Length >= 3
     requires obs.Length >= 1
     requires backlog(obs[0]) == 0
@@ -52,7 +53,7 @@ ensures in_flight < cwnd.Floor && in_flight >= 0 ==> in_flight + y == cwnd.Floor
 {
     //ibs[0] is loss, ibs[1] is serviced,ibs[2] is input obs[0] is arrived, 
     var in_flight := total_sent - total_lost - total_seen_serviced;
-    var recent_loss := backlog(ibs[0]);
+    // var recent_loss := backlog(ibs[0]);
     ibs[0] := [];
     total_lost_new := total_lost + recent_loss;
 
