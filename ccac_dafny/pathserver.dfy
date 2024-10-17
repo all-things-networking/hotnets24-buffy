@@ -145,9 +145,10 @@ predicate greaterthan0(s: seq<int>)
     ibs[0] := arrival_buf;
     var lost := 0;
     var newtokens := tokens + new_tokens - serviceincr;
+    var null_buf : Buf := [];
     if(backlog(ibs[0]) - newtokens > loss_threshold) {
       var lost_bytes := (backlog(ibs[0]) - loss_threshold);
-      ibs[0], obs[1] := moven(ibs[0], obs[1], lost_bytes);
+      ibs[0], null_buf := moven(ibs[0], null_buf, lost_bytes);
       lost := lost_bytes;
     }
     return newtokens, 
